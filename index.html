@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Où acheter ? — Prototype</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="style.css?v=5" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <h1>Où acheter&nbsp;?</h1>
+    <p class="subtitle">Trouvez les communes qui correspondent à vos critères</p>
+    <div class="mock-banner">✅ <strong>34 746 communes</strong>, toutes les données sont réelles. Prix au m² : DVF 2023. Distances mer/hôpital/gare/lac/grande ville/gendarmerie : OpenStreetMap / geo.api.gouv.fr, à vol d'oiseau — pas une distance routière. Score "bien-vivre" : composite sécurité (SSMSI) / accès aux soins (DREES) / commerces (INSEE BPE) / démographie / fiscalité locale (DGFiP), voir le détail par commune au survol.</div>
+
+    <div class="filter-group">
+      <label for="city-search">Proximité d'une ville</label>
+      <input id="city-search" type="text" placeholder="Ex : Lyon, Bordeaux..." autocomplete="off" />
+      <div id="city-suggestions" class="suggestions"></div>
+      <div id="city-selected" class="selected-chip" hidden></div>
+      <div class="slider-row" id="city-radius-row" hidden>
+        <label>Rayon max : <span id="city-radius-val">150</span> km</label>
+        <input id="city-radius" type="range" min="10" max="800" step="10" value="150" />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label for="region-select">Région</label>
+      <select id="region-select">
+        <option value="">Toutes les régions</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="dept-select">Département</label>
+      <select id="dept-select">
+        <option value="">Tous les départements</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Distance max à la mer</label>
+      <div class="slider-row">
+        <label><span id="sea-dist-val">450</span> km</label>
+        <input id="sea-dist" type="range" min="0" max="450" step="5" value="450" />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Distance max à un hôpital</label>
+      <div class="slider-row">
+        <label><span id="hopital-dist-val">40</span> km</label>
+        <input id="hopital-dist" type="range" min="0" max="40" step="1" value="40" />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Distance max à une gare</label>
+      <div class="slider-row">
+        <label><span id="gare-dist-val">60</span> km</label>
+        <input id="gare-dist" type="range" min="0" max="60" step="1" value="60" />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Distance max à une brigade de gendarmerie</label>
+      <div class="slider-row">
+        <label><span id="gendarmerie-dist-val">25</span> km</label>
+        <input id="gendarmerie-dist" type="range" min="0" max="25" step="1" value="25" />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Distance max à une grande ville (&gt;50 000 hab.)</label>
+      <div class="slider-row">
+        <label><span id="grandeville-dist-val">140</span> km</label>
+        <input id="grandeville-dist" type="range" min="0" max="140" step="5" value="140" />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Distance max à un lac</label>
+      <div class="slider-row">
+        <label><span id="lac-dist-val">65</span> km</label>
+        <input id="lac-dist" type="range" min="0" max="65" step="1" value="65" />
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Prix moyen au m² (DVF 2023)</label>
+      <div class="range-values"><span id="price-min-val">0</span> € — <span id="price-max-val">11500</span> €</div>
+      <input id="price-min" type="range" min="0" max="11500" step="100" value="0" />
+      <input id="price-max" type="range" min="0" max="11500" step="100" value="11500" />
+    </div>
+
+    <div class="filter-group">
+      <label>Score "bien-vivre" minimum</label>
+      <div class="range-values"><span id="qol-val">0</span> / 100</div>
+      <input id="qol-min" type="range" min="0" max="100" step="1" value="0" />
+    </div>
+
+    <button id="reset-btn" class="reset-btn">Réinitialiser les filtres</button>
+
+    <div class="results-panel">
+      <div id="results-count">Chargement…</div>
+      <div id="results-list" class="results-list"></div>
+    </div>
+  </aside>
+
+  <main class="map-wrap">
+    <div id="map"></div>
+    <div id="dept-tooltip" class="dept-tooltip" hidden></div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js?v=7"></script>
+</body>
+</html>

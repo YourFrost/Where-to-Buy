@@ -1,0 +1,5 @@
+# Sources brutes volumineuses (re-téléchargeables, voir README) ; on garde les requêtes Overpass
+raw_data/*
+!raw_data/*.query
+__pycache__/
+.claude/

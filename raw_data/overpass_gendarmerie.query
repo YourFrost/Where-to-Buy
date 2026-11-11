@@ -1,0 +1,8 @@
+[out:json][timeout:180];
+(
+  node["amenity"="police"]["name"~"endarmerie",i](41.0,-5.5,51.5,9.7);
+  way["amenity"="police"]["name"~"endarmerie",i](41.0,-5.5,51.5,9.7);
+  node["amenity"="police"]["operator"~"endarmerie",i](41.0,-5.5,51.5,9.7);
+  way["amenity"="police"]["operator"~"endarmerie",i](41.0,-5.5,51.5,9.7);
+);
+out center tags;
