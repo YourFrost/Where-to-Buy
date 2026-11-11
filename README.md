@@ -16,7 +16,8 @@ Puis ouvrir http://localhost:5173
 - **Région / département** : sélection directe.
 - **Distance à la mer / un hôpital / une gare / un lac / une grande ville (>50 000 hab.) / une brigade de gendarmerie** : réelles, à vol d'oiseau depuis le centre de chaque commune (OpenStreetMap pour hôpitaux/gares/lacs/littoral/gendarmerie, geo.api.gouv.fr pour les grandes villes). **Pas une distance routière** (voir Limites).
 - **Prix moyen au m²** : ✅ **données réelles DVF 2023**, propres à la commune quand il y a assez de transactions (sinon repli sur la médiane du département).
-- **Score "bien-vivre"** : ✅ composite réel (sécurité, accès aux soins, commerces/services, démographie, fiscalité locale) — voir Méthodologie ci-dessous. Le détail par axe est visible dans l'infobulle au survol d'une commune.
+- **Score "bien-vivre"** : ✅ composite réel (sécurité, accès aux soins, commerces/services, démographie, fiscalité locale) — voir Méthodologie ci-dessous. Le détail par axe est visible dans l'infobulle au survol d'une commune, et la pondération des 5 axes est réglable dans la sidebar (le score est recalculé dans le navigateur à partir des sous-scores).
+- **Export CSV** : bouton sous les filtres, exporte toutes les communes correspondant aux filtres actuels (séparateur `;`, ouvrable directement dans Excel).
 
 La carte affiche toutes les communes correspondantes sous forme de points (rendu canvas, fluide même avec les ~34 700 communes affichées en même temps). Le panneau de résultats liste séparément les 30 mieux notées ("bien-vivre").
 
@@ -85,10 +86,9 @@ Limites à connaître :
 - Les sous-scores manquants pour une commune (ex. pas de comptage BPE si aucun équipement recensé du tout, ce qui peut aussi signifier une donnée non couverte) sont simplement exclus de la moyenne plutôt que remplacés par une valeur neutre arbitraire — `score_bien_vivre_couverture` dans les données indique la part des 5 axes effectivement disponibles pour cette commune.
 - Le sous-score "Commerces/services" ne compte que les équipements **dans la commune elle-même**, pas dans les communes voisines : une petite commune juste à côté d'une ville bien équipée sera sous-notée sur cet axe (partiellement compensé par le critère de distance à une grande ville, séparé).
 - "Démographie" traite la croissance comme positive, ce qui est discutable selon le profil recherché (dynamisme vs calme/authenticité) — poids volontairement faible (10%) pour cette raison.
-- Pondération fixe pour l'instant, pas encore ajustable par l'utilisateur (voir V2).
+- Les poids par défaut (25/20/25/10/20) sont définis à la fois dans `scripts/build_bien_vivre_score.py` et `DEFAULT_WEIGHTS` dans `app.js` : à garder synchronisés si on les change.
 
 ## Prochaines étapes (V2)
 
 - **Distance routière réelle** : nécessiterait un moteur de routage auto-hébergé (OSRM + extrait OSM France ~4 Go) ou une API payante à l'échelle commune — hors de portée d'un prototype léger, voir la discussion dans l'historique du projet.
-- **Pondération du score bien-vivre ajustable** par l'utilisateur (sliders par axe plutôt que poids fixes dans le script).
 - **Frontières communales réelles** (polygones) plutôt que des points, si la performance de rendu le permet (nécessiterait un fond de carte communal, plus lourd que les centroïdes actuels).

@@ -100,9 +100,15 @@
       <input id="qol-min" type="range" min="0" max="100" step="1" value="0" />
     </div>
 
+    <div class="filter-group">
+      <label>Pondération du score bien-vivre (poids relatifs)</label>
+      <div id="weights"></div>
+    </div>
+
     <button id="reset-btn" class="reset-btn">Réinitialiser les filtres</button>
 
     <div class="results-panel">
+      <button id="export-btn" class="reset-btn">Exporter les résultats (CSV)</button>
       <div id="results-count">Chargement…</div>
       <div id="results-list" class="results-list"></div>
     </div>
@@ -115,6 +121,6 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

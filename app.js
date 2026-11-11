@@ -6,7 +6,12 @@
   // (un plafond par score créerait un biais géographique, voir historique).
   const MAX_MARKERS = 50000;
 
+  // Mêmes poids par défaut que scripts/build_bien_vivre_score.py (en %)
+  const DEFAULT_WEIGHTS = { securite: 25, acces_soins: 20, commerces: 25, demographie: 10, fiscalite: 20 };
+
   const state = {
+    weights: { ...DEFAULT_WEIGHTS },
+    matches: [],          // dernier résultat de filtrage (pour l'export CSV)
     communes: [],         // toutes les communes (data/communes-data.json)
     deptNameByCode: {},   // "01" -> "Ain" (depuis departements.geojson)
     deptToRegion: {},     // "01" -> "84"
@@ -219,8 +224,53 @@
 
   function refreshAll() {
     const matches = computeMatches();
+    state.matches = matches;
     updateResultsPanel(matches);
     debouncedUpdateMap(matches);
+  }
+
+  // Recalcule le score à partir des sous-scores par axe et des poids choisis.
+  // Poids tous à 0 -> score 0 (et non null, sinon toutes les communes disparaîtraient).
+  function recomputeScores() {
+    const w = state.weights;
+    for (const d of state.communes) {
+      let sum = 0, tot = 0;
+      for (const axe in w) {
+        const v = d.score_bien_vivre_details?.[axe];
+        if (v != null) { sum += v * w[axe]; tot += w[axe]; }
+      }
+      d.score_bien_vivre = tot > 0 ? Math.round((sum / tot) * 10) / 10 : 0;
+    }
+  }
+
+  function setupWeights() {
+    const box = document.getElementById("weights");
+    for (const [axe, label] of Object.entries(BIEN_VIVRE_AXIS_LABELS)) {
+      const row = document.createElement("div");
+      row.className = "slider-row";
+      row.innerHTML = `<label>${label} : <span id="w-${axe}-val">${state.weights[axe]}</span></label><input id="w-${axe}" type="range" min="0" max="100" step="5" value="${state.weights[axe]}" />`;
+      row.querySelector("input").addEventListener("input", (e) => {
+        state.weights[axe] = Number(e.target.value);
+        document.getElementById(`w-${axe}-val`).textContent = e.target.value;
+        recomputeScores();
+        refreshAll();
+      });
+      box.appendChild(row);
+    }
+  }
+
+  function exportCsv() {
+    const cols = ["code", "nom", "code_departement", "region_nom", "population", "prix_m2", "score_bien_vivre",
+      "distance_mer_km", "distance_hopital_km", "distance_gare_km", "distance_gendarmerie_km", "distance_grande_ville_km", "distance_lac_km"];
+    const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const rows = state.matches.map((d) => cols.map((c) => esc(d[c])).join(";"));
+    // BOM + point-virgule : s'ouvre correctement dans Excel FR
+    const blob = new Blob(["﻿" + [cols.join(";"), ...rows].join("\n")], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "communes.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
 
   function populateRegionSelect() {
@@ -380,6 +430,13 @@
     document.getElementById("city-radius-row").hidden = true;
     document.getElementById("city-suggestions").innerHTML = "";
 
+    state.weights = { ...DEFAULT_WEIGHTS };
+    for (const axe in DEFAULT_WEIGHTS) {
+      document.getElementById(`w-${axe}`).value = DEFAULT_WEIGHTS[axe];
+      document.getElementById(`w-${axe}-val`).textContent = DEFAULT_WEIGHTS[axe];
+    }
+    recomputeScores();
+
     refreshAll();
   }
 
@@ -464,6 +521,8 @@
     populateRegionSelect();
     populateDeptSelect("");
     setupFilterEvents();
+    setupWeights();
+    document.getElementById("export-btn").addEventListener("click", exportCsv);
     setupCitySearch();
 
     refreshAll();
